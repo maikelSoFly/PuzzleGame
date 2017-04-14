@@ -26,6 +26,11 @@ public class Score {
         this.moves = new SimpleIntegerProperty(0);
     }
 
+    public StringProperty movesPropertyString(){
+        StringProperty sp = new SimpleStringProperty(Integer.toString(moves.get()));
+        return sp;
+    }
+
     public String getTime() {
         return time.get();
     }

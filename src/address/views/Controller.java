@@ -7,6 +7,7 @@ import address.models.Tile;
 import address.models.Time;
 import javafx.animation.*;
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -15,11 +16,10 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
@@ -49,6 +49,11 @@ public class Controller implements Initializable {
     private Label lblTime;
     @FXML
     private Label lblMoves;
+    @FXML
+    BorderPane borderPane;
+    private TableView tableView;
+    private TableColumn<Score, String> tblColTime;
+    private TableColumn<Score, String> tblColMoves;
 
     private Main mainApp;
     private ObservableList<Tile> tilesList = FXCollections.observableArrayList();
@@ -66,6 +71,7 @@ public class Controller implements Initializable {
     @FXML
     private Label lblHighScore;
     private int previousHighscore;
+    private boolean isScoreBoardOpened = false;
 
 
     public Controller() {
@@ -96,6 +102,10 @@ public class Controller implements Initializable {
         panel.setMaxWidth(600+w);
         panel.setMinWidth(600+w);
         panel.setPrefWidth(600+w);
+
+        panel.setMaxHeight(600+w);
+        panel.setMinHeight(600+w);
+        panel.setPrefHeight(600+w);
 
         File imgFile = new File("out/production/PuzzleGame/assets/"+imageName);
 
@@ -315,6 +325,40 @@ public class Controller implements Initializable {
         public LineToAbs(Node node, double x, double y) {
             super(x - node.getLayoutX() + node.getLayoutBounds().getWidth() / 2,
                   y - node.getLayoutY() + node.getLayoutBounds().getHeight() / 2);
+        }
+    }
+
+    @FXML
+    private void handleScoreTable() {
+        if(!isScoreBoardOpened) {
+            if(tableView == null) {
+                tableView = new TableView();
+                tblColTime = new TableColumn<>("Time");
+                tblColMoves = new TableColumn<>("Moves");
+
+                tblColTime.setPrefWidth(98);
+                tblColMoves.setPrefWidth(100);
+                tblColTime.setStyle("-fx-alignment: CENTER;");
+                tblColMoves.setStyle("-fx-alignment: CENTER;");
+
+                tblColTime.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
+                tblColMoves.setCellValueFactory(cellData -> cellData.getValue().movesPropertyString());
+
+                tableView.getColumns().addAll(tblColMoves, tblColTime);
+                tableView.setPrefWidth(200);
+                tableView.setItems(mainApp.getScoreData());
+                mainApp.showScoreTable();
+                borderPane.setRight(tableView);
+            } else {
+                mainApp.showScoreTable();
+                borderPane.getRight().setVisible(true);
+
+            }
+            isScoreBoardOpened = true;
+        } else {
+            borderPane.getRight().setVisible(false);
+            mainApp.hideScoreTable();
+            isScoreBoardOpened = false;
         }
     }
 

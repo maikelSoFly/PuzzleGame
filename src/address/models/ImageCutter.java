@@ -3,7 +3,11 @@ package address.models;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.paint.ImagePattern;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
+import javafx.scene.paint.*;
+import javafx.scene.paint.Color;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -50,6 +54,7 @@ public class ImageCutter {
                     Tile tile = new Tile(part.getWidth(), part.getHeight(), part, i * tilesAmount + j);
                     tile.setLayoutX(j * (tile.getWidth() + 5) + 5);
                     tile.setLayoutY(i * (tile.getHeight() + 5) + 5);
+
                     tile.setFill(new ImagePattern(SwingFXUtils.toFXImage(tile.getPart(), null)));
                     tilesList.add(tile);
                 }

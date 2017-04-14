@@ -147,6 +147,15 @@ public class Main extends Application {
         }
     }
 
+    public void showScoreTable() {
+        primaryStage.setMaxWidth(primaryStage.getWidth()+200);
+        primaryStage.setWidth(primaryStage.getWidth()+200);
+    }
+
+    public void hideScoreTable() {
+        primaryStage.setWidth(primaryStage.getWidth()-200);
+    }
+
     public Stage getPrimaryStage() {
         return primaryStage;
     }
