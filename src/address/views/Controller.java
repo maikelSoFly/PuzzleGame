@@ -227,13 +227,20 @@ public class Controller implements Initializable {
                     mainApp.getScoreData().add(score);
 
                     File scoreFile = mainApp.getScoreFilePath();
-                    if (scoreFile != null) {
+                    if(!mainApp.isScoreFileFound()) {
+                        saveAs();
+                    }
+                    else if (scoreFile != null) {
                         mainApp.saveProductDataToFile(scoreFile);
                     } else saveAs();
 
                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                     alert.setTitle("Winner");
-                    if(moves < mainApp.getScoreData().get(1).getMoves()) alert.setHeaderText("NEW HIGHSCORE!");
+
+                    if(mainApp.isScoreFileFound() &&
+                    moves < mainApp.getScoreData().get(1).getMoves())
+                        alert.setHeaderText("NEW HIGHSCORE!");
+
                     else alert.setHeaderText("You win!");
                     alert.setContentText("Your time is: " +time.getTimeString()+ "\nMoves: " +moves);
                     alert.showAndWait();

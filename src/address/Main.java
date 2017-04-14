@@ -31,6 +31,7 @@ public class Main extends Application {
     private Stage primaryStage;
     private AnchorPane rootLayout;
     private ObservableList<Score> scoreData = FXCollections.observableArrayList();
+    private boolean scoreFileFound = true;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -111,6 +112,7 @@ public class Main extends Application {
             setProductFilePath(file);
 
         } catch (Exception e) { // catches ANY exception
+            scoreFileFound = false;
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Could not load data");
@@ -151,6 +153,10 @@ public class Main extends Application {
 
     public ObservableList<Score> getScoreData() {
         return scoreData;
+    }
+
+    public boolean isScoreFileFound() {
+        return scoreFileFound;
     }
 
     public static void main(String[] args) {
