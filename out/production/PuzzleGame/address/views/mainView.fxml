@@ -13,15 +13,16 @@
 
 <AnchorPane maxHeight="660.0" maxWidth="620.0" minHeight="660.0" minWidth="620.0" prefHeight="660.0" prefWidth="620.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="address.views.Controller">
    <children>
-      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="borderPane" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
             <AnchorPane fx:id="panel" maxHeight="620.0" maxWidth="620.0" minHeight="620.0" minWidth="620.0" prefHeight="620.0" prefWidth="620.0" />
          </center>
          <bottom>
             <HBox prefHeight="35.0" prefWidth="200.0" spacing="5.0" style="-fx-background-color: #e93c04;" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="btnShuffle" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleShuffle" text="Start" />
-                  <Pane prefHeight="200.0" prefWidth="150.0" />
+                  <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleShuffle" text="Start" />
+                  <Button mnemonicParsing="false" onAction="#handleScoreTable" text="Scores" />
+                  <Pane prefHeight="200.0" prefWidth="80.0" />
                   <Label fx:id="lblMoves" text="Moves: 0" textFill="WHITE">
                      <font>
                         <Font name="Helvetica Bold" size="13.0" />

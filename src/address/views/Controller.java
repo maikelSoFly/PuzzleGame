@@ -44,8 +44,6 @@ public class Controller implements Initializable {
     @FXML
     private AnchorPane panel;
     @FXML
-    private Button btnShuffle;
-    @FXML
     private Label lblTime;
     @FXML
     private Label lblMoves;
@@ -70,7 +68,6 @@ public class Controller implements Initializable {
     private int highScore = 0;
     @FXML
     private Label lblHighScore;
-    private int previousHighscore;
     private boolean isScoreBoardOpened = false;
 
 
@@ -151,6 +148,11 @@ public class Controller implements Initializable {
                                 public void run() {
                                     timeline.stop();
                                     isStarted = false;
+                                    if(first != null) {
+                                        first.setStrokeWidth(0);
+                                        first = null;
+                                    }
+                                    second = null;
                                     Alert alert = new Alert(Alert.AlertType.INFORMATION);
                                     alert.setTitle("You lose!");
                                     alert.setHeaderText("Time is up!");
@@ -291,7 +293,8 @@ public class Controller implements Initializable {
     private void handleShuffle() {
         moves = 0;
         lblMoves.setText("Moves: 0");
-        time.setTime(0);
+        time.setZero();
+
         lblTime.setText("Time: 0");
         Collections.shuffle(tilesList);
         for(int i = 0; i < tilesInArow; i++)
@@ -352,7 +355,6 @@ public class Controller implements Initializable {
             } else {
                 mainApp.showScoreTable();
                 borderPane.getRight().setVisible(true);
-
             }
             isScoreBoardOpened = true;
         } else {

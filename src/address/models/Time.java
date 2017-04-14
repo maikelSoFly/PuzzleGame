@@ -34,6 +34,12 @@ public class Time {
         time += 100;
     }
 
+    public void setZero() {
+        this.minutes = 0;
+        this.seconds = 0;
+        this.time = 0;
+    }
+
     public long getTime() {
         return time;
     }
@@ -60,5 +66,17 @@ public class Time {
 
     public long getMillis() {
         return millis;
+    }
+
+    public void setMinutes(long minutes) {
+        this.minutes = minutes;
+    }
+
+    public void setSeconds(long seconds) {
+        this.seconds = seconds;
+    }
+
+    public void setMillis(long millis) {
+        this.millis = millis;
     }
 }

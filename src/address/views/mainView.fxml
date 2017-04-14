@@ -20,7 +20,7 @@
          <bottom>
             <HBox prefHeight="35.0" prefWidth="200.0" spacing="5.0" style="-fx-background-color: #e93c04;" BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="btnShuffle" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleShuffle" text="Start" />
+                  <Button contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleShuffle" text="Start" />
                   <Button mnemonicParsing="false" onAction="#handleScoreTable" text="Scores" />
                   <Pane prefHeight="200.0" prefWidth="80.0" />
                   <Label fx:id="lblMoves" text="Moves: 0" textFill="WHITE">
