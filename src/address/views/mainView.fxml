@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+
+<AnchorPane maxHeight="660.0" maxWidth="620.0" minHeight="660.0" minWidth="620.0" prefHeight="660.0" prefWidth="620.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="address.views.Controller">
+   <children>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <center>
+            <AnchorPane fx:id="panel" maxHeight="620.0" maxWidth="620.0" minHeight="620.0" minWidth="620.0" prefHeight="620.0" prefWidth="620.0" />
+         </center>
+         <bottom>
+            <HBox prefHeight="35.0" prefWidth="200.0" spacing="5.0" style="-fx-background-color: #e93c04;" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="btnShuffle" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handleShuffle" text="Start" />
+                  <Pane prefHeight="200.0" prefWidth="150.0" />
+                  <Label fx:id="lblMoves" text="Moves: 0" textFill="WHITE">
+                     <font>
+                        <Font name="Helvetica Bold" size="13.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </Label>
+                  <Pane prefHeight="200.0" prefWidth="70.0" />
+                  <Label fx:id="lblTime" text="Time: 00:00:0" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="Helvetica Bold" size="13.0" />
+                     </font>
+                     <effect>
+                        <DropShadow />
+                     </effect></Label>
+                  <Pane prefHeight="200.0" prefWidth="70.0" />
+                  <Label fx:id="lblHighScore" text="Highscore: 0" textFill="WHITE">
+                     <HBox.margin>
+                        <Insets top="5.0" />
+                     </HBox.margin>
+                     <font>
+                        <Font name="Helvetica Bold" size="13.0" />
+                     </font>
+                     <effect>
+                        <DropShadow />
+                     </effect>
+                  </Label>
+               </children>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+               <padding>
+                  <Insets left="5.0" top="3.0" />
+               </padding>
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </children>
+</AnchorPane>
