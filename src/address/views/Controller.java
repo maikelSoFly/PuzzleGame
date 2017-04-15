@@ -1,26 +1,22 @@
 package address.views;
 
 import address.Main;
-import address.models.ImageCutter;
-import address.models.Score;
-import address.models.Tile;
-import address.models.Time;
+import address.models.*;
+import address.models.Slider;
 import javafx.animation.*;
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
@@ -49,26 +45,27 @@ public class Controller implements Initializable {
     private Label lblMoves;
     @FXML
     BorderPane borderPane;
-    private TableView tableView;
-    private TableColumn<Score, String> tblColTime;
-    private TableColumn<Score, String> tblColMoves;
+    @FXML
+    private Label lblHighScore;
 
+    private TableView tableView;
     private Main mainApp;
     private ObservableList<Tile> tilesList = FXCollections.observableArrayList();
     private Tile first = null;
     private Tile second = null;
-    private int tilesInArow = 4;
     private int moves = 0;
     private Time time;
     private Timeline timeline;
     private boolean isStarted = false;
     private boolean isAnimationFinished = true;
-    private int timeLimit = 2; //minutes
-    private String imageName = "ytho.jpg";
     private int highScore = 0;
-    @FXML
-    private Label lblHighScore;
     private boolean isScoreBoardOpened = false;
+    private boolean isSlideFinished = true;
+
+    //SETTINGS
+    final private int tilesInArow = 4;
+    final private int timeLimit = 2; //minutes
+    final private String imageName = "ytho.jpg";
 
 
     public Controller() {
@@ -78,15 +75,12 @@ public class Controller implements Initializable {
     public void setMainApp(Main mainApp) {
         this.mainApp = mainApp;
 
-        mainApp.getScoreData().addListener(new ListChangeListener<Score>() {
-            @Override
-            public void onChanged(Change<? extends Score> c) {
-                while (c.next()) {
-                    if(c.wasAdded() || c.wasRemoved()) {
-                       mainApp.getScoreData().sort(Comparator.comparing(Score::getMoves));
-                       highScore = mainApp.getScoreData().get(0).getMoves();
-                       lblHighScore.setText("HighScore: " +Integer.toString(highScore));
-                    }
+        mainApp.getScoreData().addListener((ListChangeListener<Score>) c -> {
+            while (c.next()) {
+                if(c.wasAdded() || c.wasRemoved()) {
+                   mainApp.getScoreData().sort(Comparator.comparing(Score::getMoves));
+                   highScore = mainApp.getScoreData().get(0).getMoves();
+                   lblHighScore.setText("HighScore: " +Integer.toString(highScore));
                 }
             }
         });
@@ -94,7 +88,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        int w = (tilesInArow+1)*5;
+        int w = (tilesInArow-1)*5;
 
         panel.setMaxWidth(600+w);
         panel.setMinWidth(600+w);
@@ -104,8 +98,8 @@ public class Controller implements Initializable {
         panel.setMinHeight(600+w);
         panel.setPrefHeight(600+w);
 
-        File imgFile = new File("out/production/PuzzleGame/assets/"+imageName);
 
+        File imgFile = new File("out/production/PuzzleGame/assets/"+imageName);
 
         ImageCutter cutter = new ImageCutter(imgFile,tilesInArow, 600);
         tilesList = cutter.cutImage();
@@ -113,23 +107,20 @@ public class Controller implements Initializable {
 
 
         for (Tile tile : tilesList) {
-            tile.setOnMouseClicked(new EventHandler<MouseEvent>() {
-                @Override
-                public void handle(MouseEvent event) {
-                    if(isStarted && isAnimationFinished) {
-                        if (first == null) {
-                            first = (Tile) event.getSource();
-                            first.setStrokeWidth(5);
-                            first.setStroke(Color.GOLD);
-                        } else {
-                            second = (Tile) event.getSource();
-                            if (second == first) {
-                                first.setStrokeWidth(0);
-                                first = null;
-                            } else if (second != null && isNeighbour()) {
-                                first.setStrokeWidth(0);
-                                playAnimation();
-                            }
+            tile.setOnMouseClicked(event -> {
+                if(isStarted && isAnimationFinished) {
+                    if (first == null) {
+                        first = (Tile) event.getSource();
+                        first.setStrokeWidth(5);
+                        first.setStroke(Color.GOLD);
+                    } else {
+                        second = (Tile) event.getSource();
+                        if (second == first) {
+                            first.setStrokeWidth(0);
+                            first = null;
+                        } else if (second != null && isNeighbour()) {
+                            first.setStrokeWidth(0);
+                            playAnimation();
                         }
                     }
                 }
@@ -138,32 +129,26 @@ public class Controller implements Initializable {
         time = new Time();
         timeline = new Timeline(new KeyFrame(
                 Duration.millis(100),
-                new EventHandler<ActionEvent>() {
-                    @Override
-                    public void handle(ActionEvent event) {
-                        if(time.getMinutes() == timeLimit) {
+                event -> {
+                    if(time.getMinutes() == timeLimit) {
+                        timeline.stop();
+                        Platform.runLater(() -> {
                             timeline.stop();
-                            Platform.runLater(new Runnable() {
-                                @Override
-                                public void run() {
-                                    timeline.stop();
-                                    isStarted = false;
-                                    if(first != null) {
-                                        first.setStrokeWidth(0);
-                                        first = null;
-                                    }
-                                    second = null;
-                                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                                    alert.setTitle("You lose!");
-                                    alert.setHeaderText("Time is up!");
-                                    alert.setContentText("Better luck next time.");
-                                    alert.showAndWait();
-                                }
-                            });
-                        }
-                        time.updateTime();
-                        lblTime.setText("Time: " +time.getTimeString());
+                            isStarted = false;
+                            if(first != null) {
+                                first.setStrokeWidth(0);
+                                first = null;
+                            }
+                            second = null;
+                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                            alert.setTitle("You lose!");
+                            alert.setHeaderText("Time is up!");
+                            alert.setContentText("Better luck next time.");
+                            alert.showAndWait();
+                        });
                     }
+                    time.updateTime();
+                    lblTime.setText("Time: " +time.getTimeString());
                 }
         ));
 
@@ -175,14 +160,11 @@ public class Controller implements Initializable {
         int indexSecond = tilesList.indexOf(second);
         int tir = tilesInArow;
 
-        if (
-           indexFirst + tir == indexSecond ||
-           indexFirst - tir == indexSecond ||
-           (indexFirst % tir != 0 && indexFirst - 1 == indexSecond) ||
-           ((indexFirst + 1) % tir != 0 && indexFirst + 1 == indexSecond)
-        ) return true;
+        return indexFirst + tir == indexSecond ||
+                indexFirst - tir == indexSecond ||
+                (indexFirst % tir != 0 && indexFirst - 1 == indexSecond) ||
+                ((indexFirst + 1) % tir != 0 && indexFirst + 1 == indexSecond);
 
-        return false;
     }
 
     private void playAnimation() {
@@ -194,16 +176,13 @@ public class Controller implements Initializable {
         PathTransition ptr2 = getPathTransition(second, first);
         ParallelTransition pt = new ParallelTransition(ptr, ptr2);
 
-        pt.setOnFinished(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                first.setTranslateX(0);
-                first.setTranslateY(0);
-                second.setTranslateX(0);
-                second.setTranslateY(0);
-                swapPuzzles();
-                isAnimationFinished = true;
-            }
+        pt.setOnFinished(event -> {
+            first.setTranslateX(0);
+            first.setTranslateY(0);
+            second.setTranslateX(0);
+            second.setTranslateY(0);
+            swapPuzzles();
+            isAnimationFinished = true;
         });
         pt.play();
     }
@@ -229,34 +208,40 @@ public class Controller implements Initializable {
         lblMoves.setText("Moves: " +Integer.toString(moves));
 
         if(checkWin()) {
-            Platform.runLater(new Runnable() {
-                @Override
-                public void run() {
-                    timeline.stop();
-                    isStarted = false;
 
-                    Score score = new Score(time.getTimeString(), moves);
-                    mainApp.getScoreData().add(score);
+            Platform.runLater(() -> {
+                timeline.stop();
+                isStarted = false;
 
-                    File scoreFile = mainApp.getScoreFilePath();
-                    if(!mainApp.isScoreFileFound()) {
-                        saveAs();
-                    }
-                    else if (scoreFile != null) {
-                        mainApp.saveProductDataToFile(scoreFile);
-                    } else saveAs();
+                Score score = new Score(time.getTimeString(), moves);
+                mainApp.getScoreData().add(score);
 
-                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                    alert.setTitle("Winner");
-
-                    if(mainApp.isScoreFileFound() &&
-                    moves < mainApp.getScoreData().get(1).getMoves())
-                        alert.setHeaderText("NEW HIGHSCORE!");
-
-                    else alert.setHeaderText("You win!");
-                    alert.setContentText("Your time is: " +time.getTimeString()+ "\nMoves: " +moves);
-                    alert.showAndWait();
+                File scoreFile = mainApp.getScoreFilePath();
+                if(!mainApp.isScoreFileFound()) {
+                    saveAs();
                 }
+                else if (scoreFile != null) {
+                    mainApp.saveProductDataToFile(scoreFile);
+                } else saveAs();
+
+                boolean wasOpened = true;
+                if(!isScoreBoardOpened) {
+                    handleScoreTable();
+                    wasOpened = false;
+                }
+
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Winner");
+
+                if(mainApp.isScoreFileFound() &&
+                moves < mainApp.getScoreData().get(1).getMoves())
+                    alert.setHeaderText("NEW HIGHSCORE!");
+
+                else alert.setHeaderText("You win!");
+                alert.setContentText("Your time is: " +time.getTimeString()+ "\nMoves: " +moves);
+                alert.showAndWait();
+                if(!wasOpened)
+                    handleScoreTable();
             });
         }
     }
@@ -300,8 +285,8 @@ public class Controller implements Initializable {
         for(int i = 0; i < tilesInArow; i++)
         for (int j = 0; j < tilesInArow; j++) {
             Tile tile = tilesList.get(i*tilesInArow+j);
-            tile.setLayoutX(j * (tile.getWidth() + 5) + 5);
-            tile.setLayoutY(i * (tile.getHeight() + 5) + 5);
+            tile.setLayoutX(j * tile.getWidth() + j*5);
+            tile.setLayoutY(i * tile.getHeight() + i*5);
         }
         isStarted = true;
         timeline.play();
@@ -319,13 +304,13 @@ public class Controller implements Initializable {
     }
 
     public static class MoveToAbs extends MoveTo {
-        public MoveToAbs(Node node) {
+        MoveToAbs(Node node) {
             super(node.getLayoutBounds().getWidth() / 2,
                   node.getLayoutBounds().getHeight() / 2);
         }
     }
     public static class LineToAbs extends LineTo {
-        public LineToAbs(Node node, double x, double y) {
+        LineToAbs(Node node, double x, double y) {
             super(x - node.getLayoutX() + node.getLayoutBounds().getWidth() / 2,
                   y - node.getLayoutY() + node.getLayoutBounds().getHeight() / 2);
         }
@@ -333,11 +318,11 @@ public class Controller implements Initializable {
 
     @FXML
     private void handleScoreTable() {
-        if(!isScoreBoardOpened) {
+        if(!isScoreBoardOpened ) {
             if(tableView == null) {
                 tableView = new TableView();
-                tblColTime = new TableColumn<>("Time");
-                tblColMoves = new TableColumn<>("Moves");
+                TableColumn<Score, String> tblColTime = new TableColumn<>("Time");
+                TableColumn<Score, String> tblColMoves = new TableColumn<>("Moves");
 
                 tblColTime.setPrefWidth(98);
                 tblColMoves.setPrefWidth(100);
@@ -350,19 +335,35 @@ public class Controller implements Initializable {
                 tableView.getColumns().addAll(tblColMoves, tblColTime);
                 tableView.setPrefWidth(200);
                 tableView.setItems(mainApp.getScoreData());
-                mainApp.showScoreTable();
+
+                Slider slider = new Slider(mainApp.getPrimaryStage(), !isScoreBoardOpened);
+                slider.play();
                 borderPane.setRight(tableView);
+
+                System.out.println("New Scoreboard created");
             } else {
-                mainApp.showScoreTable();
+                Slider slider = new Slider(mainApp.getPrimaryStage(), !isScoreBoardOpened);
+                slider.play();
                 borderPane.getRight().setVisible(true);
             }
             isScoreBoardOpened = true;
-        } else {
-            borderPane.getRight().setVisible(false);
-            mainApp.hideScoreTable();
+
+        } else if(isScoreBoardOpened ) {
+            Slider slider = new Slider(mainApp.getPrimaryStage(), !isScoreBoardOpened);
+            slider.play();
             isScoreBoardOpened = false;
         }
+
+        for(Tile tile : tilesList) {
+            if(tile.getNum() == 0) {
+                tile.setFill(new ImagePattern(SwingFXUtils.toFXImage(tile.getPart(), null)));
+            }
+        }
+
+
+        //mainApp.getPrimaryStage().getIcons().add(new Image("http://orig06.deviantart.net/3717/f/2015/152/1/e/profile_picture_by_pepefrogplz-d8vnh1o.jpg"));
     }
+
 
     public int getTilesInArow() {
         return tilesInArow;

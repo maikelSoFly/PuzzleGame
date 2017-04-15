@@ -3,11 +3,7 @@ package address.models;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Effect;
 import javafx.scene.paint.*;
-import javafx.scene.paint.Color;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -23,7 +19,6 @@ import java.io.IOException;
 
 public class ImageCutter {
     private File file;
-    private BufferedImage image;
     private  int tilesAmount;
     private ObservableList<Tile> tilesList = FXCollections.observableArrayList();
     private int size;
@@ -36,10 +31,10 @@ public class ImageCutter {
     }
 
     public ObservableList<Tile> cutImage() {
-        this.image = setImage();
+        BufferedImage image = setImage();
 
         if (image != null) {
-            System.out.println("Image size: " +image.getWidth() + " " + image.getHeight());
+            System.out.println("Image size: " + image.getWidth() + " " + image.getHeight());
 
 
             for(int i = 0; i < tilesAmount; i++) {
@@ -52,8 +47,8 @@ public class ImageCutter {
                     );
 
                     Tile tile = new Tile(part.getWidth(), part.getHeight(), part, i * tilesAmount + j);
-                    tile.setLayoutX(j * (tile.getWidth() + 5) + 5);
-                    tile.setLayoutY(i * (tile.getHeight() + 5) + 5);
+                    tile.setLayoutX(j * (tile.getWidth() ) + j*5);
+                    tile.setLayoutY(i * (tile.getHeight() ) + i*5);
 
                     tile.setFill(new ImagePattern(SwingFXUtils.toFXImage(tile.getPart(), null)));
                     tilesList.add(tile);

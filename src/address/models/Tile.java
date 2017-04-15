@@ -14,7 +14,7 @@ public class Tile extends Rectangle {
     private BufferedImage part;
     private int num;
 
-    public Tile(double width, double height, BufferedImage part, int num) {
+    Tile(double width, double height, BufferedImage part, int num) {
         super(width, height);
         this.part = part;
         this.num = num;

@@ -4,6 +4,7 @@ import address.models.Score;
 import address.models.ScoreWraper;
 import address.views.Controller;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
@@ -29,7 +30,6 @@ import java.util.prefs.Preferences;
 
 public class Main extends Application {
     private Stage primaryStage;
-    private AnchorPane rootLayout;
     private ObservableList<Score> scoreData = FXCollections.observableArrayList();
     private boolean scoreFileFound = true;
 
@@ -46,21 +46,22 @@ public class Main extends Application {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(Main.class.getResource("./views/mainView.fxml"));
-            rootLayout = (AnchorPane) loader.load();
+            AnchorPane rootLayout = loader.load();
             Controller controller = loader.getController();
             int w = 600 +(controller.getTilesInArow()+1)*5;
             rootLayout.setMaxWidth(w);
             rootLayout.setMinWidth(w);
             rootLayout.setPrefWidth(w);
 
-            rootLayout.setMaxHeight(40+w);
-            rootLayout.setMinHeight(40+w);
-            rootLayout.setPrefHeight(40+w);
+            rootLayout.setMaxHeight(45+w);
+            rootLayout.setMinHeight(45+w);
+            rootLayout.setPrefHeight(45+w);
 
             Scene scene = new Scene(rootLayout);
             primaryStage.setScene(scene);
             primaryStage.setResizable(false);
             primaryStage.show();
+            System.out.println(primaryStage.getWidth());
 
 
             controller.setMainApp( this );
@@ -88,7 +89,7 @@ public class Main extends Application {
         }
     }
 
-    public void setProductFilePath( File file ) {
+    private void setProductFilePath(File file) {
         Preferences prefs = Preferences.userNodeForPackage(Main.class);
         if (file != null) {
             prefs.put("filePath", file.getPath());
@@ -97,7 +98,7 @@ public class Main extends Application {
         }
     }
 
-    public void loadScoreDataFromFile(File file) {
+    private void loadScoreDataFromFile(File file) {
         try {
             JAXBContext context = JAXBContext.newInstance(ScoreWraper.class);
             Unmarshaller um = context.createUnmarshaller();
@@ -148,12 +149,16 @@ public class Main extends Application {
     }
 
     public void showScoreTable() {
-        primaryStage.setMaxWidth(primaryStage.getWidth()+200);
-        primaryStage.setWidth(primaryStage.getWidth()+200);
+        Platform.runLater(() -> {
+            primaryStage.setMaxWidth(primaryStage.getWidth()+200);
+            primaryStage.setWidth(primaryStage.getWidth()+200);
+        });
+
     }
 
     public void hideScoreTable() {
-        primaryStage.setWidth(primaryStage.getWidth()-200);
+        Platform.runLater(() -> primaryStage.setWidth(primaryStage.getWidth()-200));
+
     }
 
     public Stage getPrimaryStage() {
