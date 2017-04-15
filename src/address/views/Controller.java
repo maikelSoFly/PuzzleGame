@@ -8,11 +8,14 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
@@ -20,6 +23,7 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
@@ -60,7 +64,6 @@ public class Controller implements Initializable {
     private boolean isAnimationFinished = true;
     private int highScore = 0;
     private boolean isScoreBoardOpened = false;
-    private boolean isSlideFinished = true;
 
     //SETTINGS
     final private int tilesInArow = 4;
@@ -81,7 +84,9 @@ public class Controller implements Initializable {
                    mainApp.getScoreData().sort(Comparator.comparing(Score::getMoves));
                    highScore = mainApp.getScoreData().get(0).getMoves();
                    lblHighScore.setText("HighScore: " +Integer.toString(highScore));
+                    tableView.setItems(mainApp.getScoreData());
                 }
+
             }
         });
     }
@@ -97,6 +102,8 @@ public class Controller implements Initializable {
         panel.setMaxHeight(600+w);
         panel.setMinHeight(600+w);
         panel.setPrefHeight(600+w);
+
+        createTableView();
 
 
         File imgFile = new File("out/production/PuzzleGame/assets/"+imageName);
@@ -118,12 +125,24 @@ public class Controller implements Initializable {
                         if (second == first) {
                             first.setStrokeWidth(0);
                             first = null;
-                        } else if (second != null && isNeighbour()) {
+                        } else if (second != null && isNeighbour(second)) {
                             first.setStrokeWidth(0);
                             playAnimation();
                         }
                     }
                 }
+            });
+
+            tile.setOnMouseMoved(event -> {
+                if(isStarted && tile != first && (first == null || first != null && isNeighbour(tile) )) {
+                    tile.setStrokeWidth(4);
+                    tile.setStroke(Color.ORANGERED);
+                }
+            });
+
+            tile.setOnMouseExited(event -> {
+                if(tile != first)
+                    tile.setStrokeWidth(0);
             });
         }
         time = new Time();
@@ -155,9 +174,9 @@ public class Controller implements Initializable {
         timeline.setCycleCount(Animation.INDEFINITE);
     }
 
-    private boolean isNeighbour () {
+    private boolean isNeighbour (Tile tile) {
         int indexFirst = tilesList.indexOf(first);
-        int indexSecond = tilesList.indexOf(second);
+        int indexSecond = tilesList.indexOf(tile);
         int tir = tilesInArow;
 
         return indexFirst + tir == indexSecond ||
@@ -320,37 +339,24 @@ public class Controller implements Initializable {
     private void handleScoreTable() {
         if(!isScoreBoardOpened ) {
             if(tableView == null) {
-                tableView = new TableView();
-                TableColumn<Score, String> tblColTime = new TableColumn<>("Time");
-                TableColumn<Score, String> tblColMoves = new TableColumn<>("Moves");
-
-                tblColTime.setPrefWidth(98);
-                tblColMoves.setPrefWidth(100);
-                tblColTime.setStyle("-fx-alignment: CENTER;");
-                tblColMoves.setStyle("-fx-alignment: CENTER;");
-
-                tblColTime.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
-                tblColMoves.setCellValueFactory(cellData -> cellData.getValue().movesPropertyString());
-
-                tableView.getColumns().addAll(tblColMoves, tblColTime);
-                tableView.setPrefWidth(200);
-                tableView.setItems(mainApp.getScoreData());
-
                 Slider slider = new Slider(mainApp.getPrimaryStage(), !isScoreBoardOpened);
-                slider.play();
-                borderPane.setRight(tableView);
-
-                System.out.println("New Scoreboard created");
+                Thread th = new Thread(slider);
+                th.setDaemon(true);
+                th.start();
             } else {
                 Slider slider = new Slider(mainApp.getPrimaryStage(), !isScoreBoardOpened);
-                slider.play();
+                Thread th = new Thread(slider);
+                th.setDaemon(true);
+                th.start();
                 borderPane.getRight().setVisible(true);
             }
             isScoreBoardOpened = true;
 
-        } else if(isScoreBoardOpened ) {
+        } else {
             Slider slider = new Slider(mainApp.getPrimaryStage(), !isScoreBoardOpened);
-            slider.play();
+            Thread th = new Thread(slider);
+            th.setDaemon(true);
+            th.start();
             isScoreBoardOpened = false;
         }
 
@@ -359,9 +365,26 @@ public class Controller implements Initializable {
                 tile.setFill(new ImagePattern(SwingFXUtils.toFXImage(tile.getPart(), null)));
             }
         }
+    }
+
+    private void createTableView() {
+        tableView = new TableView();
+        TableColumn<Score, String> tblColTime = new TableColumn<>("Time");
+        TableColumn<Score, String> tblColMoves = new TableColumn<>("Moves");
+
+        tblColTime.setPrefWidth(98);
+        tblColMoves.setPrefWidth(100);
+        tblColTime.setStyle("-fx-alignment: CENTER;");
+        tblColMoves.setStyle("-fx-alignment: CENTER;");
+
+        tblColTime.setCellValueFactory(cellData -> cellData.getValue().timeProperty());
+        tblColMoves.setCellValueFactory(cellData -> cellData.getValue().movesPropertyString());
+
+        tableView.getColumns().addAll(tblColMoves, tblColTime);
+        tableView.setPrefWidth(200);
+        borderPane.setRight(tableView);
 
 
-        //mainApp.getPrimaryStage().getIcons().add(new Image("http://orig06.deviantart.net/3717/f/2015/152/1/e/profile_picture_by_pepefrogplz-d8vnh1o.jpg"));
     }
 
 

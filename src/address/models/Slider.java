@@ -4,6 +4,7 @@ package address.models;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.concurrent.Task;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -14,7 +15,7 @@ import javafx.util.Duration;
 //     Copyright © 2017 Mikołaj Stępniewski. All rights reserved.
 //
 
-public class Slider {
+public class Slider extends Task {
     private Stage primaryStage;
     private Timeline timeline;
     private double width;
@@ -34,7 +35,7 @@ public class Slider {
         }
 
         timeline = new Timeline(new KeyFrame(
-                Duration.millis(20),
+                Duration.millis(15),
                 event-> {
                     if(direction)
                         slideOut();
@@ -43,18 +44,18 @@ public class Slider {
         ));
     }
 
-    public Object play()  {
-
-
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-
-        return null;
-    }
+//    public Object play()  {
+//
+//
+//        timeline.setCycleCount(Animation.INDEFINITE);
+//        timeline.play();
+//
+//        return null;
+//    }
 
     private void slideOut() {
         if(width < 200) {
-            width += 10;
+            width += 20;
             primaryStage.setWidth(pw + width);
         }
         else timeline.stop();
@@ -62,7 +63,7 @@ public class Slider {
 
     private void slideIn() {
         if(width > 0) {
-            width -= 10;
+            width -= 20;
             primaryStage.setWidth(pw + width);
         }
         else timeline.stop();
@@ -86,5 +87,12 @@ public class Slider {
 
     public double getPw() {
         return pw;
+    }
+
+    @Override
+    protected Object call() throws Exception {
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        return null;
     }
 }
