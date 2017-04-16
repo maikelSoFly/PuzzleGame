@@ -127,6 +127,7 @@ public class Controller implements Initializable {
                             first = null;
                         } else if (second != null && isNeighbour(second)) {
                             first.setStrokeWidth(0);
+                            second.setStrokeWidth(0);
                             playAnimation();
                         }
                     }
@@ -135,7 +136,7 @@ public class Controller implements Initializable {
 
             tile.setOnMouseMoved(event -> {
                 if(isStarted && tile != first && (first == null || first != null && isNeighbour(tile) )) {
-                    tile.setStrokeWidth(4);
+                    tile.setStrokeWidth(3);
                     tile.setStroke(Color.ORANGERED);
                 }
             });
